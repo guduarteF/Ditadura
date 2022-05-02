@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Ground
+  - Ladder
+  - Head
+  - Enemy
+  - Right
+  - Left
+  - Wall
+  - projectile
+  - Spikes
+  - Spikes_Range
+  - Rastro
+  - Cloud
+  - Area
+  - Wooden_Box
+  - PushTrap_Range
+  - PushTrapRight
+  - PushTrapLeft
+  - Spike
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - Player
+  - Water
+  - UI
+  - Enemy
+  - Ground
+  - Head
+  - Hitbox
+  - Wooden_Box
+  - Metal_Box
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
