@@ -1,19 +1,22 @@
 fileFormatVersion: 2
-guid: 96345c64f9aaa104896d5da1b53ee1a6
+guid: cdc5bbf386fa7a0439e1ebb55a423809
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3338749442709606003
-    second: Coin_0
+      213: -7341407202210888751
+    second: door_0
   - first:
-      213: 5848064539680731454
-    second: Coin_1
+      213: 6623719234781301212
+    second: door_1
   - first:
-      213: -2652133911391862278
-    second: Coin_2
+      213: 4744073622485524861
+    second: door_2
   - first:
-      213: 5522397121026081838
-    second: Coin_3
+      213: -8810169383252994586
+    second: door_3
+  - first:
+      213: -4935834299494285922
+    second: door_4
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -103,34 +106,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Coin_0
-      rect:
-        serializedVersion: 2
-        x: 10
-        y: 0
-        width: 9
-        height: 9
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d81b24142116aa1d0800000000000000
-      internalID: -3338749442709606003
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Coin_1
+      name: door_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 9
-        height: 9
+        width: 15
+        height: 27
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -138,20 +120,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e317a37e6bf782150800000000000000
-      internalID: 5848064539680731454
+      spriteID: 1d3c9b8cb051e1a90800000000000000
+      internalID: -7341407202210888751
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Coin_2
+      name: door_1
       rect:
         serializedVersion: 2
-        x: 20
+        x: 16
         y: 0
-        width: 9
-        height: 9
+        width: 15
+        height: 27
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -159,20 +141,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: af188ba524ab13bd0800000000000000
-      internalID: -2652133911391862278
+      spriteID: cd9cf01dc8d2ceb50800000000000000
+      internalID: 6623719234781301212
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Coin_3
+      name: door_2
       rect:
         serializedVersion: 2
-        x: 30
+        x: 32
         y: 0
-        width: 9
-        height: 9
+        width: 15
+        height: 27
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -180,8 +162,50 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e2446633cee73ac40800000000000000
-      internalID: 5522397121026081838
+      spriteID: d71ec8013d556d140800000000000000
+      internalID: 4744073622485524861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: door_3
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 0
+        width: 15
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6e5de2ccf9dfbb580800000000000000
+      internalID: -8810169383252994586
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: door_4
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 15
+        height: 27
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e9d34741bd4608bb0800000000000000
+      internalID: -4935834299494285922
       vertices: []
       indices: 
       edges: []

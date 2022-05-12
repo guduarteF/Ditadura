@@ -6,12 +6,13 @@ using UnityEngine.UI;
 public class Coin : MonoBehaviour
 {
     public static int coinCounter;
-    private bool collided;
+  
+    public CoinCounter doorCoinCounter;
   
 
     void Start()
     {
-        collided = false;
+      
     }
 
     // Update is called once per frame
@@ -22,11 +23,12 @@ public class Coin : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collided == false)
+        if (collision.gameObject.tag == "Player")
         {
-            collided = true;
-            
             coinCounter++;
+            GameObject door = GameObject.Find("door").gameObject;
+            door.transform.Find("Canvas").GetComponent<CoinCounter>().collected_Coins = coinCounter;
+            //  doorCoinCounter.collected_Coins = coinCounter;
             CanvasManager.cm.txt_coin.text = coinCounter.ToString();
             //partícula
             Destroy(gameObject);
@@ -34,5 +36,21 @@ public class Coin : MonoBehaviour
 
     }
 
-  
+
+    private void OnTriggerEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Player")
+        {
+            coinCounter++;
+           
+            GameObject door = GameObject.Find("door").gameObject;
+            door.transform.Find("Canvas").GetComponent<CoinCounter>().collected_Coins = coinCounter;
+            //  doorCoinCounter.collected_Coins = coinCounter;
+            CanvasManager.cm.txt_coin.text = coinCounter.ToString();
+            //partícula
+            Destroy(gameObject);
+        }
+    }
+
+
 }

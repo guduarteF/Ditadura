@@ -22,6 +22,8 @@ TagManager:
   - PushTrapRight
   - PushTrapLeft
   - Spike
+  - CoinCol
+  - Door
   layers:
   - Default
   - TransparentFX
@@ -35,9 +37,9 @@ TagManager:
   - Hitbox
   - Wooden_Box
   - Metal_Box
-  - 
-  - 
-  - 
+  - Coin
+  - EnemyShooter
+  - CoinCol
   - 
   - 
   - 

@@ -22,6 +22,8 @@ public class EnemyMov : MonoBehaviour
     private bool spikes_delay;
     private bool readyToAttack;
 
+    public int coinsDropAmount;
+
     private void Start()
     {
         readyToAttack = true;
@@ -143,11 +145,9 @@ public class EnemyMov : MonoBehaviour
 
     IEnumerator AreaAttackDelay()
     {
-
         readyToAttack = false;
         yield return new WaitForSeconds(3f);
         readyToAttack = true;
-
     }
 
 }

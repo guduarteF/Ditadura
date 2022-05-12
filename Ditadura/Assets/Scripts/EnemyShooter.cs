@@ -13,10 +13,12 @@ public class EnemyShooter : MonoBehaviour
     public GameObject centro;
     public GameObject player_go;
 
+    public int coinsDropAmount;
+
     void Start()
     {
        
-            StartCoroutine(shoot());
+        StartCoroutine(shoot());
         
     }
 

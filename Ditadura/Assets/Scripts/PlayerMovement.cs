@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -10,8 +11,6 @@ public class PlayerMovement : MonoBehaviour
 
     private float inpX, inpXB4Jump;
     private Rigidbody2D rb;
-
-
 
     public GameObject go_ground;
     private bool changeDirection;
@@ -29,25 +28,38 @@ public class PlayerMovement : MonoBehaviour
     private PlayerMovement pm;
 
     public bool IncapableToMove;
-    
+
+    private bool CanEnterDoor;
+
+
+
+
 
 
 
     private void Awake()
     {
-
         rb = GetComponent<Rigidbody2D>();
     }
+
     void Start()
     {
         gc = go_ground.GetComponent<groundCheck>();
         pm = GetComponent<PlayerMovement>();
+      
     }
 
     void Update()
     {
-        isGrounded = gc.isGrounded;
 
+        if(Input.GetKeyDown(KeyCode.E) && CanEnterDoor)
+        {
+            SceneManager.LoadScene(gameObject.scene.buildIndex + 1);
+
+        }
+
+
+        isGrounded = gc.isGrounded;
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.W))
         {
@@ -95,11 +107,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (collision.tag == "Door")
+        {
+            CanEnterDoor = true;
+        }
 
         if (collision.tag == "Head")
         {
-            
-            GetComponent<Rigidbody2D>().AddForce(Vector2.up * impulse, ForceMode2D.Impulse);
+           
+            GetComponent<Rigidbody2D>().AddForce(Vector2.up * impulse, ForceMode2D.Impulse);    
             Destroy(collision.gameObject.transform.parent.gameObject);
         }
 
@@ -146,7 +162,14 @@ public class PlayerMovement : MonoBehaviour
             // knockback
 
         }
+
+        if(collision.tag == "Door")
+        {
+            CanEnterDoor = false;
+        }
     }
+
+    
 
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -345,5 +368,8 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-  
-}
+   
+
+
+
+ }
