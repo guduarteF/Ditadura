@@ -24,6 +24,10 @@ TagManager:
   - Spike
   - CoinCol
   - Door
+  - Lever
+  - NetTrap
+  - PushTrapUp
+  - BlueButton
   layers:
   - Default
   - TransparentFX

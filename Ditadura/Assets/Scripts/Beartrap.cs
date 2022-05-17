@@ -27,7 +27,7 @@ public class Beartrap : MonoBehaviour
                       
 
             ActivateTrap();
-            PlayerScript.PerderVida();
+            PlayerScript.PerderVida(1);
             //PlayerScript.GetComponent<Rigidbody2D>().AddForce(Vector2.up * 8, ForceMode2D.Impulse);
             //PlayerScript.IncapableToMove(1.5f);
             StartCoroutine(IncapableToMoveTimer(col_gameobject));

@@ -80,7 +80,7 @@ public class EnemyMov : MonoBehaviour
     public void DamagePlayerEffects(GameObject go_collision)
     {          
         go_collision.transform.parent.GetComponent<PlayerMovement>().Knockback(right,8);
-        go_collision.transform.parent.GetComponent<PlayerMovement>().PerderVida();      
+        go_collision.transform.parent.GetComponent<PlayerMovement>().PerderVida(1);      
     }
 
     IEnumerator Jump()

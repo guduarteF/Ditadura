@@ -31,10 +31,7 @@ public class PlayerMovement : MonoBehaviour
 
     private bool CanEnterDoor;
 
-
-
-
-
+    public bool LeverArea,LeverCenter,LeverRight , LeverLeft;
 
 
     private void Awake()
@@ -46,11 +43,69 @@ public class PlayerMovement : MonoBehaviour
     {
         gc = go_ground.GetComponent<groundCheck>();
         pm = GetComponent<PlayerMovement>();
+        LeverCenter = true;
+        
       
     }
 
     void Update()
     {
+        
+
+        //RIGHT
+        if (LeverArea == true && Input.GetKeyDown(KeyCode.E))
+        {
+            GameObject leverPivot = GameObject.Find("Lever").transform.Find("PivotBast").gameObject;
+
+            if (LeverCenter)
+            {
+                leverPivot.GetComponent<Animator>().SetBool("Right", true);
+                LeverRight = true;
+                LeverCenter = false;
+                LeverLeft = false;
+            }
+            else if(LeverLeft)
+            {
+                leverPivot.GetComponent<Animator>().SetBool("Left", false);
+                leverPivot.GetComponent<Animator>().SetBool("Right", false);
+                LeverRight = false;
+                LeverCenter = true;
+                LeverLeft = false;
+            }
+            
+           
+           
+        }
+        
+
+        if(LeverArea == true && Input.GetKeyDown(KeyCode.Q))
+        {
+            //LEFT
+            GameObject leverPivot = GameObject.Find("Lever").transform.Find("PivotBast").gameObject;
+
+            if (LeverCenter)
+            {
+                leverPivot.GetComponent<Animator>().SetBool("Left", true);
+                LeverRight = false;
+                LeverCenter = false;
+                LeverLeft = true;
+            }
+            else if (LeverRight)
+            {
+                leverPivot.GetComponent<Animator>().SetBool("Left", false);
+                leverPivot.GetComponent<Animator>().SetBool("Right", false);
+                LeverRight = false;
+                LeverCenter = true;
+                LeverLeft = false;
+            }
+        }
+
+
+        if(transform.eulerAngles.z != 0)
+        {
+            transform.eulerAngles = new Vector3(0, 0, 0);
+        }
+
 
         if(Input.GetKeyDown(KeyCode.E) && CanEnterDoor)
         {
@@ -107,6 +162,27 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+
+        if(collision.tag == "BlueButton")
+        {
+            collision.gameObject.GetComponent<Animator>().Play("buttonPressed");
+        }
+
+
+        if(collision.tag == "NetTrap")
+        {
+            // slow 
+            StartCoroutine(NetTrapEffect());
+
+
+        }
+
+        if(collision.tag == "Lever")
+        {
+            LeverArea = true;
+           
+        }
+
         if (collision.tag == "Door")
         {
             CanEnterDoor = true;
@@ -124,7 +200,7 @@ public class PlayerMovement : MonoBehaviour
             if (imortal == false)
             {
                
-                PerderVida();
+                PerderVida(1);
                 Knockback(collision.gameObject.GetComponent<projectile>().right,8);
                 Destroy(collision.gameObject);
             }
@@ -154,6 +230,17 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
+        if (collision.tag == "BlueButton")
+        {
+            collision.gameObject.GetComponent<Animator>().Play("buttonRelease");
+        }
+
+        if (collision.tag == "Lever")
+        {
+            LeverArea = false;
+           
+        }
+
         if (collision.tag == "PushTrap_Range")
         {
             //Play trap anim
@@ -184,10 +271,15 @@ public class PlayerMovement : MonoBehaviour
             Knockback(false, 60);
         }
 
+        if(collision.gameObject.tag == "PushTrapUp")
+        {
+            GetComponent<Rigidbody2D>().AddForce(Vector2.up * 60, ForceMode2D.Impulse);
+        }
+
         if(collision.gameObject.tag == "Spike")
         {
             GetComponent<Rigidbody2D>().AddForce(Vector2.up * 6, ForceMode2D.Impulse);
-            PerderVida();
+            PerderVida(3);
 
         }
     }
@@ -197,7 +289,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (imortal == false)
             {
-                PerderVida();
+                PerderVida(1);
                 
             }
         }
@@ -206,7 +298,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if(imortal == false)
             {
-                PerderVida();
+                PerderVida(1);
                 int random_num = UnityEngine.Random.Range(0, 2);
                 if (random_num == 0)
                 {
@@ -303,11 +395,11 @@ public class PlayerMovement : MonoBehaviour
         #endregion
     }
     
-    public void PerderVida()
+    public void PerderVida(int damage)
     {
         if(imortal == false)
         {
-            life--;
+            life = life - damage;
 
             switch (life)
             {
@@ -368,6 +460,15 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+
+    IEnumerator NetTrapEffect()
+    {
+        velocity = 400f;
+        GetComponent<Animator>().SetBool("Slowed", true);
+        yield return new WaitForSeconds(3f);
+        GetComponent<Animator>().SetBool("Slowed", false);
+        velocity = 800f;
+    }
    
 
 
