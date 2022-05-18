@@ -7,15 +7,17 @@ using TMPro;
 
 public class CoinCounter : MonoBehaviour
 {
+    public static CoinCounter cc;
+
     public TextMeshProUGUI txt_coin_Counter;
-    public int collected_Coins;
-    public int minimumAmount;
+    public  int collected_Coins;
+    public  int minimumAmount;
     public GameObject door , E_Key;
    
 
     void Start()
     {
-        
+        cc = this;
     }
 
     // Update is called once per frame

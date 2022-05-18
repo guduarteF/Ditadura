@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
-
+    #region VARIABLES
     public float velocity, impulse;
 
     private float inpX, inpXB4Jump;
@@ -33,12 +33,20 @@ public class PlayerMovement : MonoBehaviour
 
     public bool LeverArea,LeverCenter,LeverRight , LeverLeft;
 
+    public GameObject netTrap;
 
+    public static CoinCounter cc;
+    #endregion
+
+    #region AWAKE
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
     }
+    #endregion
 
+
+    #region START
     void Start()
     {
         gc = go_ground.GetComponent<groundCheck>();
@@ -47,7 +55,10 @@ public class PlayerMovement : MonoBehaviour
         
       
     }
+    #endregion
 
+    #region UPDATE
+   
     void Update()
     {
         
@@ -126,7 +137,10 @@ public class PlayerMovement : MonoBehaviour
         }
 
     }
+    #endregion
 
+    #region FIXEDUPDATE
+ 
     private void FixedUpdate()
     {
         if(IncapableToMove == false)
@@ -156,14 +170,25 @@ public class PlayerMovement : MonoBehaviour
 
 
     }
+    #endregion
 
-    
-
-
+    #region TRIGGER ENTER
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // TRIGGER ENTER
 
-        if(collision.tag == "BlueButton")
+        if(collision.tag == "PressurePlate")
+        {
+            if(netTrap != null)
+            netTrap.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
+        }
+
+        if (collision.tag == "RedButton")
+        {
+            collision.gameObject.GetComponent<Animator>().Play("buttonPressed");
+        }
+
+        if (collision.tag == "BlueButton")
         {
             collision.gameObject.GetComponent<Animator>().Play("buttonPressed");
         }
@@ -183,7 +208,7 @@ public class PlayerMovement : MonoBehaviour
            
         }
 
-        if (collision.tag == "Door")
+        if (collision.tag == "Door" && CoinCounter.cc.collected_Coins >= CoinCounter.cc.minimumAmount)
         {
             CanEnterDoor = true;
         }
@@ -227,10 +252,21 @@ public class PlayerMovement : MonoBehaviour
         }
        
     }
+    #endregion
 
+    #region TRIGGER EXIT
     private void OnTriggerExit2D(Collider2D collision)
     {
+
+        // TRIGGER EXIT
+
+
         if (collision.tag == "BlueButton")
+        {
+            collision.gameObject.GetComponent<Animator>().Play("buttonRelease");
+        }
+
+        if (collision.tag == "RedButton")
         {
             collision.gameObject.GetComponent<Animator>().Play("buttonRelease");
         }
@@ -256,9 +292,9 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    
+    #endregion
 
-
+    #region COLLISION ENTER
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "PushTrapRight")
@@ -315,37 +351,31 @@ public class PlayerMovement : MonoBehaviour
        
     }
 
+    #endregion
 
-   
-
-
-    private void Jump()
+    #region FUNÇÕES
+    public void Knockback(bool right, float impact)
     {
-        rb.AddForce(Vector2.up * impulse, ForceMode2D.Impulse);
-        StartCoroutine(Pulo());
-        StartCoroutine(inputB4Jump());
+        Vector2 diag_left = new Vector2(-200, 0);
+        Vector2 diag_right = new Vector2(200, 0);
 
+
+        if (right)
+        {
+            // GetComponent<Rigidbody2D>().AddForce(Vector2.up * impulse, ForceMode2D.Impulse);
+            GetComponent<Rigidbody2D>().AddForce(diag_right * impact, ForceMode2D.Force);
+        }
+        else
+        {
+            // GetComponent<Rigidbody2D>().AddForce(Vector2.up * impulse, ForceMode2D.Impulse);
+            GetComponent<Rigidbody2D>().AddForce(diag_left * impact, ForceMode2D.Force);
+        }
     }
-
-    IEnumerator Pulo()
-    {
-        yield return new WaitForSeconds(0.1f);
-        jumped = true;
-
-    }
-
-    IEnumerator inputB4Jump()
-    {
-        yield return new WaitForSeconds(0.1f);
-        inpXB4Jump = rb.velocity.x;
-
-    }
-
 
     private void velocidadeNoAr()
     {
         #region Velocidade No Ar 
-        if(!imortal)
+        if (!imortal)
         {
             if (rb.velocity.x > 15 && inpXB4Jump > 0 && changeDirection == false)
             {
@@ -394,10 +424,10 @@ public class PlayerMovement : MonoBehaviour
 
         #endregion
     }
-    
+
     public void PerderVida(int damage)
     {
-        if(imortal == false)
+        if (imortal == false)
         {
             life = life - damage;
 
@@ -429,9 +459,32 @@ public class PlayerMovement : MonoBehaviour
 
             }
         }
-        
+
 
         StartCoroutine(Invulnerability());
+    }
+    private void Jump()
+    {
+        rb.AddForce(Vector2.up * impulse, ForceMode2D.Impulse);
+        StartCoroutine(Pulo());
+        StartCoroutine(inputB4Jump());
+
+    }
+    #endregion
+
+    #region IENUMERATOR
+    IEnumerator Pulo()
+    {
+        yield return new WaitForSeconds(0.1f);
+        jumped = true;
+
+    }
+
+    IEnumerator inputB4Jump()
+    {
+        yield return new WaitForSeconds(0.1f);
+        inpXB4Jump = rb.velocity.x;
+
     }
 
     IEnumerator Invulnerability()
@@ -441,25 +494,6 @@ public class PlayerMovement : MonoBehaviour
         imortal = false;
         //Play anim
     }
-    
-    public void Knockback(bool right, float impact)
-    {    
-        Vector2 diag_left = new Vector2(-200, 0);
-        Vector2 diag_right = new Vector2(200, 0);
-
-
-        if (right)
-        {
-           // GetComponent<Rigidbody2D>().AddForce(Vector2.up * impulse, ForceMode2D.Impulse);
-            GetComponent<Rigidbody2D>().AddForce(diag_right* impact , ForceMode2D.Force);
-        }
-        else
-        {
-           // GetComponent<Rigidbody2D>().AddForce(Vector2.up * impulse, ForceMode2D.Impulse);
-            GetComponent<Rigidbody2D>().AddForce(diag_left * impact, ForceMode2D.Force);
-        }
-    }
-
 
     IEnumerator NetTrapEffect()
     {
@@ -469,8 +503,7 @@ public class PlayerMovement : MonoBehaviour
         GetComponent<Animator>().SetBool("Slowed", false);
         velocity = 800f;
     }
-   
 
-
+    #endregion
 
  }

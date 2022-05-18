@@ -19,7 +19,7 @@ public class GroundPound : MonoBehaviour
 
     private bool ref_isGrounded;
 
-    public GameObject GP_collider;
+    
 
     // Start is called before the first frame update
 

@@ -28,6 +28,8 @@ TagManager:
   - NetTrap
   - PushTrapUp
   - BlueButton
+  - RedButton
+  - PressurePlate
   layers:
   - Default
   - TransparentFX
@@ -44,7 +46,7 @@ TagManager:
   - Coin
   - EnemyShooter
   - CoinCol
-  - 
+  - NetTrap
   - 
   - 
   - 
