@@ -75,7 +75,7 @@ public class PhysicsButton1 : MonoBehaviour
         void Pressed()
         {
             prevPressedState = isPressed;
-            onPressed.Invoke(); ;
+            onPressed.Invoke();
         }
 
         void Released()

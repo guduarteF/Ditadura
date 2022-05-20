@@ -177,7 +177,12 @@ public class PlayerMovement : MonoBehaviour
     {
         // TRIGGER ENTER
 
-        if(collision.tag == "PressurePlate")
+        if (collision.tag == "Trampulim")
+        {
+            GetComponent<Rigidbody2D>().AddForce(Vector2.up * 15, ForceMode2D.Impulse);
+        }
+
+        if (collision.tag == "PressurePlate")
         {
             if(netTrap != null)
             netTrap.GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Dynamic;
@@ -186,12 +191,22 @@ public class PlayerMovement : MonoBehaviour
         if (collision.tag == "RedButton")
         {
             collision.gameObject.GetComponent<Animator>().Play("buttonPressed");
+            collision.gameObject.GetComponent<RedButton>().Pressed();
+            
         }
 
-        if (collision.tag == "BlueButton")
+        if(collision.tag == "BlueButton" && PingPongPlataform.ppp.readyToGo)
         {
             collision.gameObject.GetComponent<Animator>().Play("buttonPressed");
+            PingPongPlataform.ppp.bluebutton = true;
         }
+
+        if(collision.tag == "BlueButtonBlue" && DoorBlue.db.doorReady)
+        {
+            collision.gameObject.GetComponent<Animator>().Play("buttonPressed");
+            DoorBlue.db.OpenAndCloseDoor();
+        }
+      
 
 
         if(collision.tag == "NetTrap")
@@ -261,14 +276,12 @@ public class PlayerMovement : MonoBehaviour
         // TRIGGER EXIT
 
 
-        if (collision.tag == "BlueButton")
-        {
-            collision.gameObject.GetComponent<Animator>().Play("buttonRelease");
-        }
+        
 
         if (collision.tag == "RedButton")
         {
             collision.gameObject.GetComponent<Animator>().Play("buttonRelease");
+            RedButton.rb.Released();
         }
 
         if (collision.tag == "Lever")

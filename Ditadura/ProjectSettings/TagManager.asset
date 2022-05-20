@@ -30,6 +30,9 @@ TagManager:
   - BlueButton
   - RedButton
   - PressurePlate
+  - ButtonDoor
+  - BlueButtonBlue
+  - Trampulim
   layers:
   - Default
   - TransparentFX
@@ -47,7 +50,7 @@ TagManager:
   - EnemyShooter
   - CoinCol
   - NetTrap
-  - 
+  - ButtonDoor
   - 
   - 
   - 
