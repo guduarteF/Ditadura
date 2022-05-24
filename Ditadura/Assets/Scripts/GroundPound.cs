@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class GroundPound : MonoBehaviour
 {
+    public static GroundPound gp;
     private Rigidbody2D rb;
     private PlayerMovement pm;
     private bool groundPound;
     public float stopTime = 0.5f;
 
     [SerializeField]
-    private float dropForce = 20f;
+    public float dropForce = 20f;
 
     [SerializeField]
     private float gravityScale = 2f;
@@ -25,6 +26,7 @@ public class GroundPound : MonoBehaviour
 
     private void Awake()
     {
+        gp = this;
         pm = GetComponent<PlayerMovement>();
         rb = GetComponent<Rigidbody2D>();
     }

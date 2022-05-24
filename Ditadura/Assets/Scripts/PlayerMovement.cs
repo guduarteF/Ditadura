@@ -7,6 +7,9 @@ using UnityEngine.SceneManagement;
 public class PlayerMovement : MonoBehaviour
 {
     #region VARIABLES
+
+    public static PlayerMovement playermov;
+    
     public float velocity, impulse;
 
     private float inpX, inpXB4Jump;
@@ -36,6 +39,8 @@ public class PlayerMovement : MonoBehaviour
     public GameObject netTrap;
 
     public static CoinCounter cc;
+
+    private bool knock;
     #endregion
 
     #region AWAKE
@@ -49,9 +54,11 @@ public class PlayerMovement : MonoBehaviour
     #region START
     void Start()
     {
+        playermov = this;
         gc = go_ground.GetComponent<groundCheck>();
         pm = GetComponent<PlayerMovement>();
         LeverCenter = true;
+        knock = false;
         
       
     }
@@ -153,7 +160,7 @@ public class PlayerMovement : MonoBehaviour
         }
       
 
-        if (isGrounded)
+        if (isGrounded && !knock && !imortal)
         {
             
             rb.velocity = new Vector2(inpX * velocity * Time.deltaTime, rb.velocity.y);
@@ -179,7 +186,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (collision.tag == "Trampulim")
         {
-            GetComponent<Rigidbody2D>().AddForce(Vector2.up * 15, ForceMode2D.Impulse);
+            GetComponent<Rigidbody2D>().AddForce(Vector2.up * 40 , ForceMode2D.Impulse);
         }
 
         if (collision.tag == "PressurePlate")
@@ -231,7 +238,7 @@ public class PlayerMovement : MonoBehaviour
         if (collision.tag == "Head")
         {
            
-            GetComponent<Rigidbody2D>().AddForce(Vector2.up * impulse, ForceMode2D.Impulse);    
+            GetComponent<Rigidbody2D>().AddForce(Vector2.up * 50, ForceMode2D.Impulse);    
             Destroy(collision.gameObject.transform.parent.gameObject);
         }
 
@@ -312,7 +319,15 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.tag == "PushTrapRight")
         {
-            Knockback(true, 60);
+            StartCoroutine(Knocked());
+            Vector2 diag_right = new Vector2(200, 0);
+            GetComponent<Rigidbody2D>().AddForce(diag_right * 60, ForceMode2D.Force);
+            // GetComponent<Rigidbody2D>().AddForce(diag_right * impact, ForceMode2D.Force);
+            
+            
+                
+            
+
         }
 
         if (collision.gameObject.tag == "PushTrapLeft")
@@ -331,6 +346,7 @@ public class PlayerMovement : MonoBehaviour
             PerderVida(3);
 
         }
+
     }
     private void OnParticleCollision(GameObject other)
     {
@@ -388,7 +404,7 @@ public class PlayerMovement : MonoBehaviour
     private void velocidadeNoAr()
     {
         #region Velocidade No Ar 
-        if (!imortal)
+        if (!imortal && !knock)
         {
             if (rb.velocity.x > 15 && inpXB4Jump > 0 && changeDirection == false)
             {
@@ -429,7 +445,7 @@ public class PlayerMovement : MonoBehaviour
             }
 
         }
-        else
+        else if(!knock && !imortal)
         {
             rb.velocity = new Vector2(inpX * velocity * Time.deltaTime, rb.velocity.y);
         }
@@ -486,6 +502,14 @@ public class PlayerMovement : MonoBehaviour
     #endregion
 
     #region IENUMERATOR
+
+    IEnumerator Knocked()
+    {
+        knock = true;
+        yield return new WaitForSeconds(1f);
+        knock = false;
+    }
+
     IEnumerator Pulo()
     {
         yield return new WaitForSeconds(0.1f);
