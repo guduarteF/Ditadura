@@ -8,6 +8,7 @@ public class LadderMovement : MonoBehaviour
     private float speed = 8f;
     public bool isLadder;   //Se estiver colidindo com a escada
     private bool isClimbing; // Se estiver subindo ou descendo a escada
+    public float gravidade;
    
 
     [SerializeField]
@@ -34,7 +35,10 @@ public class LadderMovement : MonoBehaviour
         }
         else
         {
-            rb.gravityScale = 2f;      
+          
+                rb.gravityScale = gravidade;
+            
+              
 
         }
     }

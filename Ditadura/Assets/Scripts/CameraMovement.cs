@@ -13,6 +13,7 @@ public class CameraMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(playerPos.GetComponent<PlayerMovement>().IamDead == false)
         transform.position = new Vector3(playerPos.transform.position.x, playerPos.transform.position.y, transform.position.z);
         
     }

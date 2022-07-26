@@ -24,7 +24,7 @@ public class CanvasManager : MonoBehaviour
     {
         cm = this;
         pausado = false;
-        Debug.Log(InputFieldVelocity.text);
+
     }
 
     // Update is called once per frame
@@ -32,27 +32,29 @@ public class CanvasManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.P))
         {
-            if(pausado)
+            if (pausado)
             {
                 VoltarProJogo();
-                pausado = false;
+                
+                
             }
             else
             {
                 Pausar();
+                
                 pausado = true;
             }
-            
+
         }
-        
-       
-        
+
+
+
     }
 
     public void ApplyInputsToValues()
-    {     
+    {
         //VELOCIDADE
-        float input_veloc;       
+        float input_veloc;
         input_veloc = float.Parse(InputFieldVelocity.text);
         PlayerMovement.playermov.velocity = input_veloc;
 
@@ -80,12 +82,15 @@ public class CanvasManager : MonoBehaviour
 
 
     }
-    
+
     public void Pausar()
     {
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
         PauseScreen.SetActive(true);
+        Time.timeScale = 0f;
     }
-    
+
     public void SairDoJogo()
     {
         Application.Quit();
@@ -93,6 +98,25 @@ public class CanvasManager : MonoBehaviour
 
     public void VoltarProJogo()
     {
+        pausado = false;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
         PauseScreen.SetActive(false);
+        Time.timeScale = 1f;
     }
+
+    public void Scene3D()
+    {
+        SceneManager.LoadScene("fase 1");
+        Time.timeScale = 1f;
+
+    }
+
+    public void Scene2D()
+    {
+        SceneManager.LoadScene("SampleScene");
+        Time.timeScale = 1f;
+    }
+
+
 }

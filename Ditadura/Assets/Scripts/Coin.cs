@@ -23,8 +23,9 @@ public class Coin : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Player")
+        if (collision.gameObject.tag == "Player" || collision.gameObject.tag == "Right" || collision.gameObject.tag == "Left")
         {
+            FindObjectOfType<AudioManager>().Play("Coin");
             coinCounter++;
             GameObject door = GameObject.Find("door").gameObject;
             door.transform.Find("Canvas").GetComponent<CoinCounter>().collected_Coins = coinCounter;
@@ -39,7 +40,7 @@ public class Coin : MonoBehaviour
 
     private void OnTriggerEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "Player")
+        if (collision.gameObject.tag == "Player" || collision.gameObject.tag == "Right" || collision.gameObject.tag == "Left")
         {
             coinCounter++;
            

@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 
 
+
 public class PlayerMovement : MonoBehaviour
 {
     #region VARIABLES
@@ -19,7 +20,7 @@ public class PlayerMovement : MonoBehaviour
 
     public GameObject go_ground;
     private bool changeDirection;
-    private bool jumped;
+    public bool jumped;
     public bool isGrounded;
 
     private groundCheck gc;
@@ -43,6 +44,35 @@ public class PlayerMovement : MonoBehaviour
     public static CoinCounter cc;
 
     private bool knock;
+
+    // Variáveis para O Coyote Jump e o Buffer Jump
+    private float _jumpBuffer = 0.1f;
+    private float lastJumpPressed;
+    private bool coyoteUsable;
+    public float timeLeftGrounded;
+    public float _coyoteTimeThreshold = 0.1f;
+
+    public bool cooldown;
+    public bool onAirAfterJump;
+    public bool spacePressed;
+
+
+    public bool CanUseCoyote;
+    public bool HasBufferedJump;
+
+    private Animator anim;
+
+    public Transform respawn_pos;
+
+    public ParticleSystem death_part;
+
+    public bool IamDead;
+
+    
+
+
+
+
     #endregion
 
     #region AWAKE
@@ -56,22 +86,123 @@ public class PlayerMovement : MonoBehaviour
     #region START
     void Start()
     {
+        cooldown = true;
         playermov = this;
         gc = go_ground.GetComponent<groundCheck>();
         pm = GetComponent<PlayerMovement>();
         LeverCenter = true;
         knock = false;
+        anim = GetComponent<Animator>();
         
-      
     }
     #endregion
 
     #region UPDATE
-   
+
+    public GameObject raySpawnPointObject;
+    private bool canJumpWhenFall;
+    public bool whenFallWillJump;
+    public bool executandoPulo;
+
     void Update()
     {
-        
 
+       if(inpX > 0)
+       {
+            GetComponent<SpriteRenderer>().flipX = false;
+       }
+
+       if(inpX < 0)
+       {
+            GetComponent<SpriteRenderer>().flipX = true;
+       }
+
+        if(isGrounded)
+        {
+            if (inpX > 0 || inpX < 0)
+            {
+
+                anim.SetBool("Run", true);
+            }
+            else
+            {
+                anim.SetBool("Run", false);
+            }
+
+
+            //if (rb.velocity.x < 4 || rb.velocity.x > -4)
+            //{
+
+            //    anim.SetBool("Idle", true);
+            //}
+        }
+       
+
+
+        if(jumped)
+        {
+            anim.SetBool("Jump", true);
+        }
+        else
+        {
+            anim.SetBool("Jump", false);
+        }
+       
+        CanUseCoyote = coyoteUsable && !isGrounded && timeLeftGrounded + _coyoteTimeThreshold > Time.time;
+        HasBufferedJump = isGrounded && lastJumpPressed + _jumpBuffer > Time.time;
+
+        RaycastHit2D ray = Physics2D.Raycast(raySpawnPointObject.transform.position, Vector2.down, 2.5f);
+        Debug.DrawRay(gameObject.transform.position, Vector2.down * 2.5f, Color.red, 0f);
+
+        if(ray.collider != null)
+        {
+            if(ray.collider.name == "Ground")
+            {
+              
+                canJumpWhenFall = true;
+            }  
+        }
+        else
+        {
+            canJumpWhenFall = false;
+        }
+      
+        if(jumped && canJumpWhenFall)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                StartCoroutine(JumpWhenFall());
+            }
+        }
+               
+        if (isGrounded)
+        {
+            canJumpWhenFall = false;
+            cooldown = true;
+
+            if(whenFallWillJump  && !executandoPulo)
+            {
+                Jump();
+                StartCoroutine(ExecPulo());
+                spacePressed = true;
+                StartCoroutine(SpaceFalse());
+                whenFallWillJump = false;
+            }
+        }
+
+        if (!isGrounded && !knock && !jumped)
+        {
+            if(cooldown && !spacePressed)
+            {
+                timeLeftGrounded = Time.time;
+                coyoteUsable = true;
+                cooldown = false;
+            }
+                                   
+            
+        }
+
+        
         //RIGHT
         if (LeverArea == true && Input.GetKeyDown(KeyCode.E))
         {
@@ -93,8 +224,7 @@ public class PlayerMovement : MonoBehaviour
                 LeverLeft = false;
             }
             
-           
-           
+                    
         }
         
 
@@ -138,9 +268,20 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.W))
         {
-            if (isGrounded)
+            if (isGrounded && !executandoPulo && !whenFallWillJump)
             {
                 Jump();
+                spacePressed = true;
+                StartCoroutine(SpaceFalse());
+                lastJumpPressed = Time.time;
+                
+            }
+
+            if (CanUseCoyote)
+            {
+                Jump();
+                coyoteUsable = false;
+                timeLeftGrounded = float.MinValue;
             }
 
         }
@@ -152,6 +293,7 @@ public class PlayerMovement : MonoBehaviour
  
     private void FixedUpdate()
     {
+
         if(IncapableToMove == false)
         {
             inpX = Input.GetAxis("Horizontal");
@@ -188,6 +330,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (collision.tag == "Trampulim")
         {
+            FindObjectOfType<AudioManager>().Play("Trampoline");
             GetComponent<Rigidbody2D>().AddForce(Vector2.up * 40 , ForceMode2D.Impulse);
         }
 
@@ -240,7 +383,7 @@ public class PlayerMovement : MonoBehaviour
         if (collision.tag == "Head")
         {
            
-            GetComponent<Rigidbody2D>().AddForce(Vector2.up * 50, ForceMode2D.Impulse);    
+            GetComponent<Rigidbody2D>().AddForce(Vector2.up * 25, ForceMode2D.Impulse);    
             Destroy(collision.gameObject.transform.parent.gameObject);
         }
 
@@ -248,7 +391,6 @@ public class PlayerMovement : MonoBehaviour
         {
             if (imortal == false)
             {
-               
                 PerderVida(1);
                 Knockback(collision.gameObject.GetComponent<projectile>().right,8);
                 Destroy(collision.gameObject);
@@ -285,8 +427,7 @@ public class PlayerMovement : MonoBehaviour
         // TRIGGER EXIT
 
 
-        
-
+       
         if (collision.tag == "RedButton")
         {
             collision.gameObject.GetComponent<Animator>().Play("buttonRelease");
@@ -326,10 +467,6 @@ public class PlayerMovement : MonoBehaviour
             GetComponent<Rigidbody2D>().AddForce(diag_right * 60, ForceMode2D.Force);
             // GetComponent<Rigidbody2D>().AddForce(diag_right * impact, ForceMode2D.Force);
             
-            
-                
-            
-
         }
 
         if (collision.gameObject.tag == "PushTrapLeft")
@@ -390,7 +527,6 @@ public class PlayerMovement : MonoBehaviour
         Vector2 diag_left = new Vector2(-200, 0);
         Vector2 diag_right = new Vector2(200, 0);
 
-
         if (right)
         {
             // GetComponent<Rigidbody2D>().AddForce(Vector2.up * impulse, ForceMode2D.Impulse);
@@ -406,6 +542,7 @@ public class PlayerMovement : MonoBehaviour
     private void velocidadeNoAr()
     {
         #region Velocidade No Ar 
+
         if (!imortal && !knock)
         {
             if (rb.velocity.x > 15 && inpXB4Jump > 0 && changeDirection == false)
@@ -420,13 +557,13 @@ public class PlayerMovement : MonoBehaviour
             }
             else if (rb.velocity.x > 0 && inpXB4Jump < 0)
             {
-                rb.velocity = new Vector2(inpX * velocity / 2 * Time.deltaTime, rb.velocity.y);
+                rb.velocity = new Vector2(inpX * velocity / 1.3f * Time.deltaTime, rb.velocity.y);
                 changeDirection = true;
 
             }
             else if (rb.velocity.x < 0 && inpXB4Jump > 0)
             {
-                rb.velocity = new Vector2(inpX * velocity / 2 * Time.deltaTime, rb.velocity.y);
+                rb.velocity = new Vector2(inpX * velocity / 1.3f* Time.deltaTime, rb.velocity.y);
                 changeDirection = true;
 
             }
@@ -437,17 +574,17 @@ public class PlayerMovement : MonoBehaviour
             }
             else if (inpXB4Jump == 0 && jumped == true)
             {
-                rb.velocity = new Vector2(inpX * velocity / 2 * Time.deltaTime, rb.velocity.y);
+                rb.velocity = new Vector2(inpX * velocity / 1.3f * Time.deltaTime, rb.velocity.y);
 
             }
             else
             {
-                rb.velocity = new Vector2(inpX * velocity / 2 * Time.deltaTime, rb.velocity.y);
+                rb.velocity = new Vector2(inpX * velocity / 1.3f * Time.deltaTime, rb.velocity.y);
 
             }
 
         }
-        else if(!knock && !imortal)
+        else if(!knock )
         {
             rb.velocity = new Vector2(inpX * velocity * Time.deltaTime, rb.velocity.y);
         }
@@ -461,10 +598,12 @@ public class PlayerMovement : MonoBehaviour
         if (imortal == false)
         {
             life = life - damage;
+            FindObjectOfType<AudioManager>().Play("Life");
 
             switch (life)
             {
                 case 0:
+                    Dead();
                     heart1.SetActive(false);
                     heart2.SetActive(false);
                     heart3.SetActive(false);
@@ -496,15 +635,54 @@ public class PlayerMovement : MonoBehaviour
     }
     private void Jump()
     {
-        rb.AddForce(Vector2.up * impulse, ForceMode2D.Impulse);
-        StartCoroutine(Pulo());
-        StartCoroutine(inputB4Jump());
+        if(IncapableToMove == false)
+        {
+            rb.AddForce(Vector2.up * impulse, ForceMode2D.Impulse);
+            FindObjectOfType<AudioManager>().Play("Jump");
+            onAirAfterJump = true;
+            StartCoroutine(Pulo());
+            StartCoroutine(inputB4Jump());
+        }
+       
+         
+    }
+
+    private void Dead()
+    {
+        IamDead = true;
+        Instantiate(death_part, gameObject.transform.position, death_part.transform.rotation);
+        transform.Find("right").gameObject.GetComponent<BoxCollider2D>().enabled = false;
+        transform.Find("left").gameObject.GetComponent<BoxCollider2D>().enabled = false;
+        GetComponent<SpriteRenderer>().enabled = false;
+        IncapableToMove = true;
+        GetComponent<TrailRenderer>().enabled = false;
+        StartCoroutine(timeToRespawn());
+      
 
     }
     #endregion
 
     #region IENUMERATOR
 
+    IEnumerator timeToRespawn()
+    {
+       
+        yield return new WaitForSeconds(2f);
+        IamDead = false;
+        IncapableToMove = false;
+        GetComponent<TrailRenderer>().enabled = true;
+        GetComponent<SpriteRenderer>().enabled = true;
+        transform.Find("right").gameObject.GetComponent<BoxCollider2D>().enabled = true;
+        transform.Find("left").gameObject.GetComponent<BoxCollider2D>().enabled = true;
+        transform.position = respawn_pos.position;
+        life = 3;
+        heart1.SetActive(true);
+        heart2.SetActive(true);
+        heart3.SetActive(true);
+        FindObjectOfType<AudioManager>().Play("Dying");
+
+
+    }
     IEnumerator Knocked()
     {
         knock = true;
@@ -543,6 +721,25 @@ public class PlayerMovement : MonoBehaviour
         velocity = 800f;
     }
 
+    IEnumerator SpaceFalse()
+    {
+        yield return new WaitForSeconds(0.1f);
+        spacePressed = false;
+    }
+   
+    IEnumerator JumpWhenFall()
+    {
+        whenFallWillJump = true;
+        yield return new WaitForSeconds(1f);
+        
+    }
+
+    IEnumerator ExecPulo()
+    {
+        executandoPulo = true;
+        yield return new WaitForSeconds(0.3f);
+        executandoPulo = false;
+    }
     #endregion
 
- }
+}

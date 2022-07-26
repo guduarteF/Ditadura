@@ -14,7 +14,7 @@ public class GroundPound : MonoBehaviour
     public float dropForce = 20f;
 
     [SerializeField]
-    private float gravityScale = 2f;
+    private float gravityScale;
 
     public bool isGroundPounding = false;
 
@@ -67,6 +67,7 @@ public class GroundPound : MonoBehaviour
         }
         groundPound = false;
     }
+
     private void GroundPoundAttack()
     {
         isGroundPounding = true;

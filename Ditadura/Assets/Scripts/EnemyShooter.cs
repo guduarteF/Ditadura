@@ -35,6 +35,7 @@ public class EnemyShooter : MonoBehaviour
     { 
        
         GameObject bullet = Instantiate(projectile, spawnPoint.position, Quaternion.identity);
+        Destroy(bullet, 2f);
 
         if (position_shooter)
         {

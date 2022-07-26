@@ -23,6 +23,11 @@ public class PlayerController : MonoBehaviour, IPlayerController
 
     private void Update()
     {
+        if(!Grounded)
+        {
+
+        }
+
         if (!_active) return;
         // Calculate velocity
         Velocity = (transform.position - _lastPosition) / Time.deltaTime;
@@ -44,6 +49,7 @@ public class PlayerController : MonoBehaviour, IPlayerController
 
     private void GatherInput()
     {
+
         Input = new FrameInput
         {
             JumpDown = UnityEngine.Input.GetButtonDown("Jump"),
@@ -76,7 +82,7 @@ public class PlayerController : MonoBehaviour, IPlayerController
     {
         // Generate ray ranges. 
         CalculateRayRanged();
-
+        
         // Ground
         LandingThisFrame = false;
         var groundedCheck = RunDetection(_raysDown);
@@ -111,7 +117,7 @@ public class PlayerController : MonoBehaviour, IPlayerController
         _raysRight = new RayRange(b.max.x, b.min.y + _rayBuffer, b.max.x, b.max.y - _rayBuffer, Vector2.right);
     }
 
-
+  
     private IEnumerable<Vector2> EvaluateRayPositions(RayRange range)
     {
         for (var i = 0; i < _detectorCount; i++)
@@ -179,6 +185,8 @@ public class PlayerController : MonoBehaviour, IPlayerController
             _currentHorizontalSpeed = Mathf.MoveTowards(_currentHorizontalSpeed, 0, _deAcceleration * Time.deltaTime);
         }
 
+
+        // * importante
         if (_currentHorizontalSpeed > 0 && _colRight || _currentHorizontalSpeed < 0 && _colLeft)
         {
             // Don't walk through walls
