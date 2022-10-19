@@ -9,10 +9,11 @@ public class InventorySystem : MonoBehaviour
     public GameObject[] pickableItens;
     public GameObject cam;
     public GameObject E_to_PickUp;
+    public Text E_to_PickUp_txt;
 
     public GameObject[] Slot_backg;
     public GameObject[] Slot_icon;
-    private bool[] Slot_pressed;
+    public bool[] Slot_pressed;
 
     private int[] slots;
 
@@ -25,6 +26,7 @@ public class InventorySystem : MonoBehaviour
 
     public GameObject Lighter_prefab;
 
+    
 
     private void Awake()
     { 
@@ -52,6 +54,8 @@ public class InventorySystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+       
+
         Ray raio = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
@@ -63,6 +67,7 @@ public class InventorySystem : MonoBehaviour
             if (hit.collider.gameObject.CompareTag("pickableObject"))
             {
                 E_to_PickUp.SetActive(true);
+                E_to_PickUp_txt.text = "'E' to pickup";
 
                 if (Input.GetKeyDown(KeyCode.E))
                 {
@@ -282,8 +287,7 @@ public class InventorySystem : MonoBehaviour
     private void EquipLighterSlot(RaycastHit hit)
     {
         slots[0] = 1;
-        Slot_icon[0].GetComponent<Image>().sprite = hit.collider.gameObject.GetComponent<imageSource>().img;
-        
+        Slot_icon[0].GetComponent<Image>().sprite = hit.collider.gameObject.GetComponent<imageSource>().img;        
     }
 
     // PICK UP IN HAND

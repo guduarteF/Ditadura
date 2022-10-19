@@ -106,149 +106,14 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-
-       if(inpX > 0)
-       {
-            GetComponent<SpriteRenderer>().flipX = false;
-       }
-
-       if(inpX < 0)
-       {
-            GetComponent<SpriteRenderer>().flipX = true;
-       }
-
-        if(isGrounded)
-        {
-            if (inpX > 0 || inpX < 0)
-            {
-
-                anim.SetBool("Run", true);
-            }
-            else
-            {
-                anim.SetBool("Run", false);
-            }
-
-
-            //if (rb.velocity.x < 4 || rb.velocity.x > -4)
-            //{
-
-            //    anim.SetBool("Idle", true);
-            //}
-        }
-       
-
-
-        if(jumped)
-        {
-            anim.SetBool("Jump", true);
-        }
-        else
-        {
-            anim.SetBool("Jump", false);
-        }
-       
-        CanUseCoyote = coyoteUsable && !isGrounded && timeLeftGrounded + _coyoteTimeThreshold > Time.time;
-        HasBufferedJump = isGrounded && lastJumpPressed + _jumpBuffer > Time.time;
-
-        RaycastHit2D ray = Physics2D.Raycast(raySpawnPointObject.transform.position, Vector2.down, 2.5f);
-        Debug.DrawRay(gameObject.transform.position, Vector2.down * 2.5f, Color.red, 0f);
-
-        if(ray.collider != null)
-        {
-            if(ray.collider.name == "Ground")
-            {
-              
-                canJumpWhenFall = true;
-            }  
-        }
-        else
-        {
-            canJumpWhenFall = false;
-        }
-      
-        if(jumped && canJumpWhenFall)
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                StartCoroutine(JumpWhenFall());
-            }
-        }
-               
-        if (isGrounded)
-        {
-            canJumpWhenFall = false;
-            cooldown = true;
-
-            if(whenFallWillJump  && !executandoPulo)
-            {
-                Jump();
-                StartCoroutine(ExecPulo());
-                spacePressed = true;
-                StartCoroutine(SpaceFalse());
-                whenFallWillJump = false;
-            }
-        }
-
-        if (!isGrounded && !knock && !jumped)
-        {
-            if(cooldown && !spacePressed)
-            {
-                timeLeftGrounded = Time.time;
-                coyoteUsable = true;
-                cooldown = false;
-            }
-                                   
-            
-        }
-
         
-        //RIGHT
-        if (LeverArea == true && Input.GetKeyDown(KeyCode.E))
-        {
-            GameObject leverPivot = GameObject.Find("Lever").transform.Find("PivotBast").gameObject;
-
-            if (LeverCenter)
-            {
-                leverPivot.GetComponent<Animator>().SetBool("Right", true);
-                LeverRight = true;
-                LeverCenter = false;
-                LeverLeft = false;
-            }
-            else if(LeverLeft)
-            {
-                leverPivot.GetComponent<Animator>().SetBool("Left", false);
-                leverPivot.GetComponent<Animator>().SetBool("Right", false);
-                LeverRight = false;
-                LeverCenter = true;
-                LeverLeft = false;
-            }
-            
-                    
-        }
-        
-
-        if(LeverArea == true && Input.GetKeyDown(KeyCode.Q))
-        {
-            //LEFT
-            GameObject leverPivot = GameObject.Find("Lever").transform.Find("PivotBast").gameObject;
-
-            if (LeverCenter)
-            {
-                leverPivot.GetComponent<Animator>().SetBool("Left", true);
-                LeverRight = false;
-                LeverCenter = false;
-                LeverLeft = true;
-            }
-            else if (LeverRight)
-            {
-                leverPivot.GetComponent<Animator>().SetBool("Left", false);
-                leverPivot.GetComponent<Animator>().SetBool("Right", false);
-                LeverRight = false;
-                LeverCenter = true;
-                LeverLeft = false;
-            }
-        }
+        HorizontalMovement();
+        RunAnim();
+        JumpAnim();
+        Coyote_BufferedJump();
+        Lever();
+        SpaceToJump();
+        PressEToEnterDoor();
 
 
         if(transform.eulerAngles.z != 0)
@@ -256,71 +121,21 @@ public class PlayerMovement : MonoBehaviour
             transform.eulerAngles = new Vector3(0, 0, 0);
         }
 
-
-        if(Input.GetKeyDown(KeyCode.E) && CanEnterDoor)
-        {
-            SceneManager.LoadScene(gameObject.scene.buildIndex + 1);
-
-        }
-
-
-        isGrounded = gc.isGrounded;
-
-        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.W))
-        {
-            if (isGrounded && !executandoPulo && !whenFallWillJump)
-            {
-                Jump();
-                spacePressed = true;
-                StartCoroutine(SpaceFalse());
-                lastJumpPressed = Time.time;
-                
-            }
-
-            if (CanUseCoyote)
-            {
-                Jump();
-                coyoteUsable = false;
-                timeLeftGrounded = float.MinValue;
-            }
-
-        }
+        isGrounded = gc.isGrounded;      
 
     }
+
     #endregion
 
     #region FIXEDUPDATE
- 
+
     private void FixedUpdate()
     {
-
-        if(IncapableToMove == false)
-        {
-            inpX = Input.GetAxis("Horizontal");
-        }
-        else
-        {
-            inpX = 0f ;
-        }
-      
-
-        if (isGrounded && !knock && !imortal)
-        {
-            
-            rb.velocity = new Vector2(inpX * velocity * Time.deltaTime, rb.velocity.y);
-                       
-            changeDirection = false;
-            jumped = false;
-            inpXB4Jump = 0;
-
-        }
-        else //Se estiver no ar
-        {
-            velocidadeNoAr();
-        }
-
-
+        InputX();
+        Velocity();
     }
+
+
     #endregion
 
     #region TRIGGER ENTER
@@ -522,6 +337,231 @@ public class PlayerMovement : MonoBehaviour
     #endregion
 
     #region FUNÇÕES
+
+    private void InputX()
+    {
+        if (IncapableToMove == false)
+        {
+            inpX = Input.GetAxis("Horizontal");
+        }
+        else
+        {
+            inpX = 0f;
+        }
+    }
+
+    private void Velocity()
+    {
+        if (isGrounded && !knock && !imortal)
+        {
+
+            rb.velocity = new Vector2(inpX * velocity * Time.deltaTime, rb.velocity.y);
+
+            changeDirection = false;
+            jumped = false;
+            inpXB4Jump = 0;
+
+        }
+        else //Se estiver no ar
+        {
+            AirVelocity();
+        }
+    }
+
+    private void PressEToEnterDoor()
+    {
+        if (Input.GetKeyDown(KeyCode.E) && CanEnterDoor)
+        {
+            SceneManager.LoadScene(gameObject.scene.buildIndex + 1);
+
+        }
+
+    }
+
+    private void SpaceToJump()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.W))
+        {
+            if (isGrounded && !executandoPulo && !whenFallWillJump)
+            {
+                Jump();
+                spacePressed = true;
+                StartCoroutine(SpaceFalse());
+                lastJumpPressed = Time.time;
+
+            }
+
+            if (CanUseCoyote)
+            {
+                Jump();
+                coyoteUsable = false;
+                timeLeftGrounded = float.MinValue;
+            }
+
+        }
+    }
+
+    private void Lever()
+    {
+        //lever    
+        //RIGHT
+        if (LeverArea == true && Input.GetKeyDown(KeyCode.E))
+        {
+            GameObject leverPivot = GameObject.Find("Lever").transform.Find("PivotBast").gameObject;
+
+            if (LeverCenter)
+            {
+                leverPivot.GetComponent<Animator>().SetBool("Right", true);
+                LeverRight = true;
+                LeverCenter = false;
+                LeverLeft = false;
+            }
+            else if (LeverLeft)
+            {
+                leverPivot.GetComponent<Animator>().SetBool("Left", false);
+                leverPivot.GetComponent<Animator>().SetBool("Right", false);
+                LeverRight = false;
+                LeverCenter = true;
+                LeverLeft = false;
+            }
+
+
+        }
+
+
+        if (LeverArea == true && Input.GetKeyDown(KeyCode.Q))
+        {
+            //LEFT
+            GameObject leverPivot = GameObject.Find("Lever").transform.Find("PivotBast").gameObject;
+
+            if (LeverCenter)
+            {
+                leverPivot.GetComponent<Animator>().SetBool("Left", true);
+                LeverRight = false;
+                LeverCenter = false;
+                LeverLeft = true;
+            }
+            else if (LeverRight)
+            {
+                leverPivot.GetComponent<Animator>().SetBool("Left", false);
+                leverPivot.GetComponent<Animator>().SetBool("Right", false);
+                LeverRight = false;
+                LeverCenter = true;
+                LeverLeft = false;
+            }
+        }
+    }
+    private void Coyote_BufferedJump()
+    {
+        //Coyote
+        //Buferred jump
+        CanUseCoyote = coyoteUsable && !isGrounded && timeLeftGrounded + _coyoteTimeThreshold > Time.time;
+        HasBufferedJump = isGrounded && lastJumpPressed + _jumpBuffer > Time.time;
+
+        RaycastHit2D ray = Physics2D.Raycast(raySpawnPointObject.transform.position, Vector2.down, 2.5f);
+        Debug.DrawRay(gameObject.transform.position, Vector2.down * 2.5f, Color.red, 0f);
+
+        if (ray.collider != null)
+        {
+            if (ray.collider.name == "Ground")
+            {
+
+                canJumpWhenFall = true;
+            }
+        }
+        else
+        {
+            canJumpWhenFall = false;
+        }
+
+        if (jumped && canJumpWhenFall)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                StartCoroutine(JumpWhenFall());
+            }
+        }
+
+        if (isGrounded)
+        {
+            canJumpWhenFall = false;
+            cooldown = true;
+
+            if (whenFallWillJump && !executandoPulo)
+            {
+                Jump();
+                StartCoroutine(ExecPulo());
+                spacePressed = true;
+                StartCoroutine(SpaceFalse());
+                whenFallWillJump = false;
+            }
+        }
+
+        if (!isGrounded && !knock && !jumped)
+        {
+            if (cooldown && !spacePressed)
+            {
+                timeLeftGrounded = Time.time;
+                coyoteUsable = true;
+                cooldown = false;
+            }
+
+
+        }
+    }
+
+    private void JumpAnim()
+    {
+        //animação pulo
+        if (jumped)
+        {
+            anim.SetBool("Jump", true);
+        }
+        else
+        {
+            anim.SetBool("Jump", false);
+        }
+
+    }
+
+    private void RunAnim()
+    {
+        if (isGrounded)
+        {
+            if (inpX > 0 || inpX < 0)
+            {
+
+                anim.SetBool("Run", true);
+            }
+            else
+            {
+                anim.SetBool("Run", false);
+            }
+
+
+            //if (rb.velocity.x < 4 || rb.velocity.x > -4)
+            //{
+
+            //    anim.SetBool("Idle", true);
+            //}
+        }
+    }
+
+    private void HorizontalMovement()
+    {
+        if (inpX > 0)
+        {
+            GetComponent<SpriteRenderer>().flipX = false;
+        }
+
+        if (inpX < 0)
+        {
+            GetComponent<SpriteRenderer>().flipX = true;
+        }
+    }
+
+   
+
     public void Knockback(bool right, float impact)
     {
         Vector2 diag_left = new Vector2(-200, 0);
@@ -539,7 +579,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void velocidadeNoAr()
+    private void AirVelocity()
     {
         #region Velocidade No Ar 
 
@@ -741,5 +781,7 @@ public class PlayerMovement : MonoBehaviour
         executandoPulo = false;
     }
     #endregion
+
+
 
 }
